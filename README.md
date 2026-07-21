@@ -1,5 +1,7 @@
 # invossh
 
+> **Note:** Renamed from sshctl to avoid ecosystem name collisions. Legacy env SSHCTL_* and config dir ~/.sshctl are still accepted.
+
 > Renamed from `sshctl` to avoid widespread name collisions (PyPI/AUR/GitHub).
 
 **English** | [中文](#invossh-中文)
@@ -216,4 +218,5 @@ invossh completion powershell > invossh.ps1
 ## 许可证
 
 MIT — 见 [LICENSE](LICENSE)。
+
 
