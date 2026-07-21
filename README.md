@@ -1,15 +1,32 @@
 # sshctl
 
+**English** | [中文](#sshctl-中文)
+
 High-performance cross-platform SSH/SCP CLI with an encrypted local server inventory.
+
+> **Built primarily for AI agents** (Cursor, Claude Code, Codex, and similar).
+> Stable, scriptable subcommands and JSON inventory make remote exec / SCP easy for tools to call without interactive prompts.
+
+Humans can use it too — the UX prioritizes machine-friendly flags, exit codes, and search (`-s`) over a rich TUI.
 
 ## Features
 
-- Single static binaries for Linux / Windows / macOS (amd64 + arm64)
+- Single static binaries: Linux / Windows / macOS (amd64 + arm64)
 - Remote command execution and interactive shells
 - Fast file transfer via SFTP (`scp` subcommand, directories supported)
 - AES-256-GCM encrypted passwords at rest (`enc:v1:`)
 - Case-insensitive contains search on name / IP / description
 - Host key verification via `~/.ssh/known_hosts` (optional `--insecure` for labs)
+- Default config outside the repo: `~/.sshctl/servers.json`
+
+## Why AI-first?
+
+| Need | How sshctl helps |
+|------|------------------|
+| Non-interactive | `exec` / `scp` / `list` / `search` — no TTY prompts for common flows |
+| Discover hosts | `search -s <keyword>` on name, IP, description |
+| Safe-ish secrets | Passwords encrypted on disk; agents pass `--password` only when adding |
+| Predictable I/O | Tabular list output + non-zero exit on remote failure |
 
 ## Install
 
@@ -17,7 +34,7 @@ High-performance cross-platform SSH/SCP CLI with an encrypted local server inven
 go install github.com/Fracizz/sshctl@latest
 ```
 
-Or download a release binary / build from source:
+Or from source:
 
 ```bash
 git clone https://github.com/Fracizz/sshctl.git
@@ -75,3 +92,73 @@ Read [SECURITY.md](SECURITY.md). Ciphertext is bound to the local machine user m
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+---
+
+# sshctl (中文)
+
+高性能跨平台 SSH/SCP 命令行工具，带本地加密主机清单。
+
+> **主要面向 AI 编程助手使用**（Cursor、Claude Code、Codex 等）。
+> 子命令稳定、可脚本化，配合 JSON 主机清单，方便 Agent 非交互地执行远程命令与文件传输。
+
+人工使用同样可以；交互式体验让位于：机器友好的参数、退出码，以及 `-s` 模糊搜索。
+
+## 特性
+
+- 单文件二进制：Linux / Windows / macOS（amd64 + arm64）
+- 远程命令执行、交互 Shell
+- 基于 SFTP 的高速传文件（`scp` 子命令，支持目录）
+- 密码落盘 AES-256-GCM 加密（`enc:v1:`）
+- 对 name / IP / description 不区分大小写的包含搜索
+- 默认校验 `~/.ssh/known_hosts`（实验环境可用 `--insecure`）
+- 配置默认在仓库外：`~/.sshctl/servers.json`
+
+## 为何适合 AI？
+
+| 需求 | sshctl 的做法 |
+|------|----------------|
+| 非交互 | `exec` / `scp` / `list` / `search`，常见流程不弹密码提示 |
+| 找机器 | `search -s <关键词>` 匹配名称、IP、描述 |
+| 密钥/密码 | 密码加密存储；Agent 仅在 `add` 时传入一次 `--password` |
+| 输出稳定 | 表格列表；远端失败返回非 0 退出码 |
+
+## 安装
+
+```bash
+go install github.com/Fracizz/sshctl@latest
+```
+
+或源码编译：
+
+```bash
+git clone https://github.com/Fracizz/sshctl.git
+cd sshctl
+go build -o bin/sshctl .
+```
+
+## 快速开始
+
+```bash
+sshctl init
+sshctl add --name lab --host 192.0.2.10 --user root --password 'secret' --desc "实验机"
+sshctl add --name prod --host 192.0.2.11 --user root --key ~/.ssh/id_ed25519 --desc "生产"
+
+sshctl list
+sshctl search -s 192.0.2
+sshctl exec lab -- hostname
+sshctl shell lab
+sshctl scp ./app.tar.gz lab:/tmp/app.tar.gz
+```
+
+配置优先级：`--config` > `$SSHCTL_CONFIG` > `~/.sshctl/servers.json`
+
+首次连接请先写入 OpenSSH `known_hosts`（或仅在可信实验环境使用 `--insecure`）。
+
+## 安全说明
+
+详见 [SECURITY.md](SECURITY.md)。密文与本机用户环境绑定，换机器需重新录入密码。
+
+## 许可证
+
+MIT — 见 [LICENSE](LICENSE)。

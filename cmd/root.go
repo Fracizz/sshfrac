@@ -16,7 +16,7 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use:           "sshctl",
-	Short:         "High-performance SSH/SCP CLI with encrypted server inventory",
+	Short:         "AI-friendly SSH/SCP CLI with encrypted server inventory",
 	SilenceUsage:  true,
 	SilenceErrors: true,
 	Version:       Version,
