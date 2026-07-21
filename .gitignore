@@ -1,0 +1,30 @@
+# Binaries
+/bin/
+/dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/sshctl
+/sshctl-*
+
+# Local secrets / machine config (never commit)
+servers.json
+*.local.json
+.sshctl/
+hello.txt
+*.bak
+
+# Go
+vendor/
+*.test
+*.out
+coverage.*
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

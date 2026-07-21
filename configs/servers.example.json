@@ -1,0 +1,23 @@
+{
+  "servers": [
+    {
+      "name": "example-host",
+      "description": "示例条目：请改成真实主机，并用 add --password 写入密码（勿提交明文）",
+      "host": "192.0.2.10",
+      "port": 22,
+      "user": "root",
+      "password": "REPLACE_ME",
+      "os": "Linux"
+    },
+    {
+      "name": "example-key-host",
+      "description": "示例免密条目：填写本机私钥路径",
+      "host": "192.0.2.11",
+      "port": 22,
+      "user": "root",
+      "password": "",
+      "os": "Linux",
+      "key_file": "C:\\Users\\YOUR_USER\\.ssh\\id_ed25519"
+    }
+  ]
+}

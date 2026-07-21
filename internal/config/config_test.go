@@ -1,0 +1,75 @@
+package config_test
+
+import (
+	"path/filepath"
+	"testing"
+
+	"github.com/Fracizz/sshctl/internal/config"
+	"github.com/Fracizz/sshctl/internal/crypto"
+)
+
+func TestSearchCaseInsensitiveContains(t *testing.T) {
+	f := &config.File{Servers: []config.Server{
+		{Name: "Lab-Alpha", Host: "192.0.2.10", Description: "Primary LAB"},
+		{Name: "other", Host: "198.51.100.1", Description: "unused"},
+	}}
+	hits := f.Search("lab")
+	if len(hits) != 1 || hits[0].Host != "192.0.2.10" {
+		t.Fatalf("search lab: got %#v", hits)
+	}
+	hits = f.Search("192.0.2")
+	if len(hits) != 1 {
+		t.Fatalf("search ip fragment: got %d", len(hits))
+	}
+}
+
+func TestFindExactThenFuzzy(t *testing.T) {
+	f := &config.File{Servers: []config.Server{
+		{Name: "web", Host: "192.0.2.10", User: "root"},
+		{Name: "db", Host: "192.0.2.20", User: "root"},
+	}}
+	s, err := f.Find("web")
+	if err != nil || s.Host != "192.0.2.10" {
+		t.Fatalf("exact: %v %#v", err, s)
+	}
+	s, err = f.Find("192.0.2.20")
+	if err != nil || s.Name != "db" {
+		t.Fatalf("host: %v %#v", err, s)
+	}
+	if _, err := f.Find("192.0.2"); err == nil {
+		t.Fatal("expected ambiguous error")
+	}
+}
+
+func TestEncryptRoundTripOnSave(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "servers.json")
+	f := &config.File{}
+	if err := f.Add(config.Server{Name: "t", Host: "192.0.2.10", User: "root", Password: "secret", OS: "Linux"}); err != nil {
+		t.Fatal(err)
+	}
+	if !crypto.IsEncrypted(f.Servers[0].Password) {
+		t.Fatal("expected encrypted password after Add")
+	}
+	if err := config.Save(path, f); err != nil {
+		t.Fatal(err)
+	}
+	loaded, err := config.Load(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	plain, err := loaded.Servers[0].PlainPassword()
+	if err != nil || plain != "secret" {
+		t.Fatalf("decrypt: %v %q", err, plain)
+	}
+}
+
+func TestDefaultConfigPathOutsideCwd(t *testing.T) {
+	p := config.DefaultConfigPath()
+	if filepath.Base(p) != "servers.json" {
+		t.Fatalf("base: %s", p)
+	}
+	if filepath.Base(filepath.Dir(p)) != ".sshctl" {
+		t.Fatalf("dir: %s", p)
+	}
+}
