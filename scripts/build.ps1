@@ -17,6 +17,7 @@ Write-Host "building $out"
 $targets = @(
     (Join-Path "skills" (Join-Path "sshctl" "bin")),
     (Join-Path $env:USERPROFILE ".claude\skills\sshctl\bin"),
+    (Join-Path $env:USERPROFILE ".cursor\skills\sshctl\bin"),
     (Join-Path $env:USERPROFILE ".codex\skills\sshctl\bin")
 )
 foreach ($binDir in $targets) {
