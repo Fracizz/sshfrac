@@ -42,7 +42,7 @@ $sshctl = Join-Path $skillRoot 'bin\sshctl.exe'
 在仓库根目录（仅 Windows amd64；会同步到仓库 skill 与已存在的 `.claude` / `.codex` skill `bin\`）：
 
 ```powershell
-$env:VERSION = '0.2.3'
+$env:VERSION = '0.2.4'
 .\scripts\build.ps1
 ```
 
@@ -52,14 +52,21 @@ $env:VERSION = '0.2.3'
 go build -o skills\sshctl\bin\sshctl.exe .
 ```
 
-`bin/` 下的 exe **不入库**。也可从 [Releases](https://github.com/Fracizz/sshctl/releases) 取 `sshctl-windows-amd64.zip`，把 `sshctl.exe` 放到 `$skillRoot\bin\`。
+`bin/` 下的 exe **不入库**。也可从 [Releases](https://github.com/Fracizz/sshctl/releases) 直接下载可执行文件（非 zip）：
 
-多平台发布包：推送 `v*` 标签，由 GitHub Actions（`release.yml`）打 zip 并创建 Release；**不要**本机打发布包。
+| 平台 | 资源名 |
+|------|--------|
+| Windows amd64 | `sshctl-windows-amd64.exe` → 重命名为 `sshctl.exe` |
+| Windows arm64 | `sshctl-windows-arm64.exe` |
+| Linux amd64/arm64 | `sshctl-linux-amd64` / `sshctl-linux-arm64` |
+| macOS Intel / Apple Silicon | `sshctl-darwin-amd64` / `sshctl-darwin-arm64` |
+
+多平台发布：推送 `v*` 标签，由 GitHub Actions 构建上述二进制并创建 Release；**不要**本机打全平台包。
 
 ### 验证
 
 ```powershell
-& $sshctl version    # 0.2.3+
+& $sshctl version    # 0.2.4+
 & $sshctl list
 ```
 

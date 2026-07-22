@@ -53,9 +53,15 @@ $sshctl = Join-Path $skillRoot 'bin\sshctl.exe'
 & $sshctl version
 ```
 
-`skills/sshctl/bin/` is gitignored; clone from source or copy `sshctl.exe` from a [release zip](https://github.com/Fracizz/sshctl/releases).
+`skills/sshctl/bin/` is gitignored; clone from source or download the executable from [Releases](https://github.com/Fracizz/sshctl/releases) (not zip):
 
-Multi-platform release packages: push a `v*` tag; GitHub Actions (`.github/workflows/release.yml`) builds zips and creates the Release.
+| Platform | Asset |
+|----------|--------|
+| Windows amd64 / arm64 | `sshctl-windows-amd64.exe` / `sshctl-windows-arm64.exe` |
+| Linux amd64 / arm64 | `sshctl-linux-amd64` / `sshctl-linux-arm64` |
+| macOS Intel / Apple Silicon | `sshctl-darwin-amd64` / `sshctl-darwin-arm64` |
+
+Multi-platform release: push a `v*` tag; GitHub Actions builds the six binaries and attaches them to the Release.
 
 **General CLI use** (optional, not required for skills):
 
@@ -208,7 +214,7 @@ go build -o skills/sshctl/bin/sshctl.exe .
 
 技能说明：[skills/sshctl/SKILL.md](skills/sshctl/SKILL.md) — `$skillRoot` 为本 `SKILL.md` 所在目录，通过 `$sshctl = Join-Path $skillRoot 'bin\sshctl.exe'` 调用。
 
-`skills/sshctl/bin/` 不入库；克隆后需本地构建或从 [Releases](https://github.com/Fracizz/sshctl/releases) 复制 `sshctl.exe`。
+`skills/sshctl/bin/` 不入库；克隆后需本地构建，或从 [Releases](https://github.com/Fracizz/sshctl/releases) 下载对应平台可执行文件（非 zip，Windows 用 `sshctl-windows-amd64.exe` 重命名为 `sshctl.exe`）。
 
 **通用 CLI（可选）：**
 

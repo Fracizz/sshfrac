@@ -48,26 +48,27 @@ jobs:
       - name: Version from tag
         id: ver
         run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
-      - name: Build and zip
+      - name: Build binary
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: "0"
           VERSION: ${{ steps.ver.outputs.version }}
         run: |
-          name="sshctl-${GOOS}-${GOARCH}"
-          if [ "$GOOS" = "windows" ]; then
-            bin="sshctl.exe"
-          else
-            bin="sshctl"
-          fi
-          go build -ldflags "-s -w -X github.com/Fracizz/sshctl/cmd.Version=${VERSION}" -o "$bin" .
           mkdir -p dist
-          zip -j "dist/${name}.zip" "$bin"
+          if [ "$GOOS" = "windows" ]; then
+            out="dist/sshctl-${GOOS}-${GOARCH}.exe"
+          else
+            out="dist/sshctl-${GOOS}-${GOARCH}"
+          fi
+          go build -ldflags "-s -w -X github.com/Fracizz/sshctl/cmd.Version=${VERSION}" -o "$out" .
+          ls -la dist
       - uses: actions/upload-artifact@v4
         with:
           name: sshctl-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: dist/sshctl-*.zip
+          path: |
+            dist/sshctl-*
+            !dist/*.zip
 
   publish:
     needs: [build]
@@ -79,11 +80,34 @@ jobs:
           pattern: sshctl-*
           merge-multiple: true
       - name: List assets
-        run: ls -la artifacts
+        run: |
+          ls -la artifacts
+          # 仅保留可执行文件，排除任何 zip
+          find artifacts -type f -name '*.zip' -delete
+          find artifacts -type f | sort
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/*.zip
+          # Windows: sshctl-windows-amd64.exe；其它: sshctl-linux-amd64 等
+          files: |
+            artifacts/sshctl-windows-*.exe
+            artifacts/sshctl-linux-*
+            artifacts/sshctl-darwin-*
           generate_release_notes: true
+          body: |
+            ## Binaries
+
+            Download the executable for your platform (no zip):
+
+            | Platform | Asset |
+            |----------|--------|
+            | Windows amd64 | `sshctl-windows-amd64.exe` |
+            | Windows arm64 | `sshctl-windows-arm64.exe` |
+            | Linux amd64 | `sshctl-linux-amd64` |
+            | Linux arm64 | `sshctl-linux-arm64` |
+            | macOS Intel | `sshctl-darwin-amd64` |
+            | macOS Apple Silicon | `sshctl-darwin-arm64` |
+
+            Agent skill (Windows): rename to `sshctl.exe` and place under `skills/sshctl/bin/`.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
